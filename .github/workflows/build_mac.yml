@@ -1,0 +1,33 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # позволяет запускать вручную из интерфейса
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pynput numpy pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed TestKeyboard.py
+
+      - name: Upload artifact (the .app)
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestKeyboard-macOS
+          path: dist/TestKeyboard.app
